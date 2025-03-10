@@ -6,13 +6,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const dotsContainer = document.querySelector(".dots");
   let currentIndex = 0;
   const totalSlides = slides.length;
+  let autoSlideTimeout;
 
   function updateSlidePosition() {
     slidesContainer.style.transform = `translateX(-${currentIndex * 100}%)`;
-    console.log(currentIndex);
-    var bgImgBox = document.getElementById(`img${currentIndex+1}`).children[0];
-    var bgImg = bgImgBox.getAttribute("src");
-    console.log(bgImg);
+    console.log("Current Index:", currentIndex);
+    const bgImgBox = document.getElementById(`img${currentIndex + 1}`).children[0];
+    const bgImg = bgImgBox.getAttribute("src");
     document.body.style.backgroundImage = `url(${bgImg})`;
   }
 
@@ -21,6 +21,16 @@ document.addEventListener("DOMContentLoaded", () => {
     dots.forEach((dot, index) => {
       dot.classList.toggle("active", index === currentIndex);
     });
+  }
+
+  function startAutoSlide() {
+    clearTimeout(autoSlideTimeout);
+    autoSlideTimeout = setTimeout(() => {
+      currentIndex = (currentIndex + 1) % totalSlides;
+      updateSlidePosition();
+      updateDots();
+      startAutoSlide(); 
+    }, 5000);
   }
 
   for (let i = 0; i < totalSlides; i++) {
@@ -33,6 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
       currentIndex = i;
       updateSlidePosition();
       updateDots();
+      startAutoSlide(); 
     });
     dotsContainer.appendChild(dot);
   }
@@ -41,18 +52,15 @@ document.addEventListener("DOMContentLoaded", () => {
     currentIndex = (currentIndex + 1) % totalSlides;
     updateSlidePosition();
     updateDots();
+    startAutoSlide();
   });
 
   prevBtn.addEventListener("click", () => {
     currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
     updateSlidePosition();
     updateDots();
+    startAutoSlide();
   });
 
-  setInterval(() => {
-    currentIndex = (currentIndex + 1) % totalSlides;
-    updateSlidePosition();
-    updateDots();
-  }, 5000);
-
+  startAutoSlide();
 });
